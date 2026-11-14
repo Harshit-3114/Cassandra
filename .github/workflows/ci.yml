@@ -1,4 +1,4 @@
-name: argus-ci
+name: cassandra-ci
 on:
   push: { branches: [main, master] }   # repo's default branch is `master`
   pull_request:
@@ -7,13 +7,16 @@ jobs:
   test:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v6
-      - uses: actions/setup-python@v6
+      - uses: actions/checkout@v7
+      - uses: actions/setup-python@v7
         with: { python-version: "3.11" }
       - name: Install
         run: |
           pip install -r requirements.txt -r requirements-api.txt -r requirements-ingest.txt
-          pip install pytest ruff
+          # Pinned so the lint result cannot move when ruff changes its
+          # default rule set. The rule selection itself lives in
+          # pyproject.toml ([tool.ruff.lint]).
+          pip install pytest ruff==0.17.5
       - name: Lint (ruff — F/E9 defect classes, config in pyproject.toml)
         run: ruff check .
       - name: Engine smoke tests (14)
